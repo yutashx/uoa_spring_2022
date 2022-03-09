@@ -4,3 +4,4 @@ Game
 games
 OpenSiv3D
 .DS_Store
+*.log
