@@ -1,3 +1,5 @@
+init:
+	mkdir log data
 run_docker:
 	docker run -it --rm --gpus all -v `pwd`:/work/ shintomi_blockout_ai bash
 train_test:
