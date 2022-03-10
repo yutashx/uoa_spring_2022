@@ -15,8 +15,6 @@ def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
 
     for batch_idx, (data, label) in enumerate(train_loader, 0):
-        #data = batch["image"]
-        #target = batch["label"]
         data = data.to(device)
         target = label.to(device)
         optimizer.zero_grad()
@@ -109,7 +107,6 @@ def main():
     print(train_loader.pin_memory)
 
     print(device)
-    #model = Net().to(device)
     model = blockout.Net().to(device)
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 

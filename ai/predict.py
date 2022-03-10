@@ -26,6 +26,14 @@ def predict(model, device, test_loader):
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
     """
+def estimate(model, device, image):
+    model.eval()
+    with torch.no_grad():
+        image = imgae.to(device)
+        output = model(image)
+        pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+        print(pred)
+
 
 def get_parser():
     parser = ArgumentParser(description="some description")
@@ -74,6 +82,8 @@ if __name__ == "__main__":
         ])
     dataset = utils.CustomImageDataset(args.test_label, args.test_dataset)
     test_loader = torch.utils.data.DataLoader(dataset, **kwargs)
-    print(list(test_loader))
+
+    image = read_image(path_image).to(torch.float32)
+    estimate(model, device, image)
 
     #predict(model, device, test_loader)
