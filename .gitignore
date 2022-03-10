@@ -5,3 +5,6 @@ games
 OpenSiv3D
 .DS_Store
 *.log
+log
+*pt
+*pth

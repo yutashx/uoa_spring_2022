@@ -9,35 +9,8 @@ from torch.optim.lr_scheduler import StepLR
 import os
 import utils
 
-#torch.set_default_tensor_type("torch.cuda.FloatTensor")
-
 
 class Net(nn.Module):
-    """
-    def __init__(self):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, 3, 1)
-        self.conv2 = nn.Conv2d(32, 64, 3, 1)
-        self.dropout1 = nn.Dropout2d(0.25)
-        self.dropout2 = nn.Dropout2d(0.5)
-        self.fc1 = nn.Linear(9216, 128)# 9216 = h * w * channel = 12 * 12 * 64
-        self.fc2 = nn.Linear(128, 10)
-
-    def forward(self, x):
-        x = self.conv1(x)
-        x = F.relu(x)
-        x = self.conv2(x)
-        x = F.relu(x)
-        x = F.max_pool2d(x, 2)
-        x = self.dropout1(x)
-        x = torch.flatten(x, 1)
-        x = self.fc1(x)
-        x = F.relu(x)
-        x = self.dropout2(x)
-        x = self.fc2(x)
-        output = F.log_softmax(x, dim=1)
-        return output
-    """
     def __init__(self):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, 1, padding="same") #conv2d(in_channels, out_chnnels, kernel_size, stride=1, padding="same")
@@ -164,44 +137,19 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
         ])
-    """
-    dataset1 = datasets.MNIST('../data', train=True, download=True,
-                       transform=transform)
-    dataset2 = datasets.MNIST('../data', train=False,
-                       transform=transform)
-    train_loader = torch.utils.data.DataLoader(dataset1,**kwargs)
-    test_loader = torch.utils.data.DataLoader(dataset2, **kwargs)
-    dataset1 = torch.utils.data.DataLoader(args.test_dataset)
-    dataset2 = torch.utils.data.DataLoader(args.train_dataset)
 
-    dataset0 = datasets.ImageFolder(args.test_dataset, transform)
-    dataset2 = datasets.ImageFolder(args.train_dataset, transform)
-
-    dataset1 = utils.CustomImageDataset(args.train_label, args.train_dataset, transform=transform)
-    dataset2 = utils.CustomImageDataset(args.test_label, args.test_dataset, transform=transform)
-
-    """
     dataset1 = utils.CustomImageDataset(args.train_label, args.train_dataset)
     dataset2 = utils.CustomImageDataset(args.test_label, args.test_dataset)
 
     train_loader = torch.utils.data.DataLoader(dataset1, **kwargs)
     test_loader = torch.utils.data.DataLoader(dataset2, **kwargs)
     print(train_loader.pin_memory)
-    #train_loader = torch.utils.data.DataLoader(dataset1,**kwargs)
-    #test_loader = torch.utils.data.DataLoader(dataset2, **kwargs)
-    #print(train_loader)
-
 
     print(device)
     model = Net().to(device)
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-    """
-    for d in dataset_loader:
-        print(d["image"])
-        break
-    """
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
         test(model, device, test_loader)
