@@ -1,38 +1,19 @@
 import torch
 #from torchvision import model
-import blockout
+#import blockout
 from argparse import ArgumentParser
 import utils
 import torch.optim as optim
-from torchvision import datasets, transforms
-from torch.optim.lr_scheduler import StepLR
+from torchvision.io import read_image
 
-def predict(model, device, test_loader):
-    model.eval()
-    test_loss = 0
-    correct = 0
-    with torch.no_grad():
-        for data, target in test_loader:
-            data, target = data.to(device), target.to(device)
-            output = model(data) #
-            test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
-            pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
-            #correct += pred.eq(target.view_as(pred)).sum().item()
-
-    #test_loss /= len(test_loader.dataset)
-
-    """
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
-    """
 def estimate(model, device, image):
     model.eval()
     with torch.no_grad():
-        image = imgae.to(device)
+        image = image.to(device)
         output = model(image)
-        pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
-        print(pred)
+        pred = output.argmax(dim=1, keepdim=True) 
+        output = pred.cpu().numpy().copy()
+    return output
 
 
 def get_parser():
@@ -43,14 +24,6 @@ def get_parser():
                         help='path to model state')
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='disables CUDA training')
-    parser.add_argument('--test_label', default="../data/MNIST-flatten/test_labels.csv",
-                        help='input test dataset path')
-    parser.add_argument('--test_dataset', default="../data/MNIST-flatten/test",
-                        help='input test dataset path')
-    parser.add_argument('--lr', type=float, default=1.0, metavar='LR',
-                        help='learning rate (default: 1.0)')
-    parser.add_argument('--batch-size', type=int, default=64, metavar='N',
-                        help='input batch size for training (default: 64)')
 
     return parser
 
@@ -63,27 +36,11 @@ if __name__ == "__main__":
     use_cuda = not args.no_cuda and torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
 
-    # load model
-    model = blockout.Net().to(device)
     model_path = args.path_model
+    model = torch.load(model_path)
 
-    if use_cuda == "cuda":
-        model.load_state_dict(model_path)
-    else:
-        model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
-
-    optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
-    kwargs = {'batch_size': args.batch_size}
-
-    # load dataset
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
-        ])
-    dataset = utils.CustomImageDataset(args.test_label, args.test_dataset)
-    test_loader = torch.utils.data.DataLoader(dataset, **kwargs)
-
-    image = read_image(path_image).to(torch.float32)
-    estimate(model, device, image)
-
-    #predict(model, device, test_loader)
+    image = read_image(args.path_image).to(torch.float32)
+    image = image[None,:] # (3,256,256) -> (1,3,256,256)
+    print(image.size()) 
+    output = estimate(model, device, image)[0][0]
+    print(output)

@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
+from torchvision.io import read_image
 from torch.optim.lr_scheduler import StepLR
 import os
 import utils
@@ -36,6 +37,7 @@ def test(model, device, test_loader):
     correct = 0
     with torch.no_grad():
         for data, target in test_loader:
+            print(data.size())
             data, target = data.to(device), target.to(device)
             output = model(data) #
             test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
@@ -99,6 +101,7 @@ def main():
         transforms.Normalize((0.1307,), (0.3081,))
         ])
 
+
     dataset1 = utils.CustomImageDataset(args.train_label, args.train_dataset)
     dataset2 = utils.CustomImageDataset(args.test_label, args.test_dataset)
 
@@ -112,7 +115,7 @@ def main():
 
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
     for epoch in range(1, args.epochs + 1):
-        train(args, model, device, train_loader, optimizer, epoch)
+        #train(args, model, device, train_loader, optimizer, epoch)
         test(model, device, test_loader)
         scheduler.step()
 
