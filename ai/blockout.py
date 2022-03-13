@@ -14,6 +14,11 @@ class Net(nn.Module):
         self.fc2 = nn.Linear(128, 3)
 
     def forward(self, x): # 256
+        # for NES
+        b, c, h, w = x.size()
+        pw2 = 256 - w
+        ph2 = 256 - h
+        x = F.pad(x, (0, pw2, 0, ph2, 0, 0, 0, 0))
         x = self.conv1(x) # 254
         x = F.relu(x)
         x = F.max_pool2d(x, 2) # 127
